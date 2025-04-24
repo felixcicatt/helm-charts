@@ -9,7 +9,6 @@ metadata:
 data:
   AFDELINGEN_BASE_URL: {{ default (printf "http://objecten.%s.svc.cluster.local" .Release.Namespace) .Values.kiss.objecten.baseUrl | quote }}
   AFDELINGEN_OBJECT_TYPE_URL: {{ printf "%s/api/v2/objecttypes/%s" .Values.kiss.objecttypen.baseUrlExtern .Values.kiss.objecttypen.afdelingUUID | quote }}
-  REGISTERS__0__CONTACTMOMENTEN_BASE_URL: {{ default (printf "http://kiss-adapter.%s.svc.cluster.local" .Release.Namespace) .Values.kiss.adapter.baseUrl | quote }}
   ELASTIC_BASE_URL: {{ default (printf "https://kiss-es-http.%s.svc.cluster.local:9200" .Release.Namespace) .Values.kiss.elastic.baseUrl | quote }}
   {{- if .Values.kiss.email.host }}
   EMAIL_HOST: {{ .Values.kiss.email.host | quote }}
@@ -30,9 +29,6 @@ data:
   GROEPEN_BASE_URL: {{ default (printf "http://objecten.%s.svc.cluster.local" .Release.Namespace) .Values.kiss.objecten.baseUrl | quote }}
   GROEPEN_OBJECT_TYPE_URL: {{ printf "%s/api/v2/objecttypes/%s" .Values.kiss.objecttypen.baseUrlExtern .Values.kiss.objecttypen.groepUUID | quote }}
   HAAL_CENTRAAL_BASE_URL: {{ .Values.kiss.brp.baseUrl | quote }}
-  REGISTERS__0__INTERNE_TAAK_BASE_URL: {{ default (printf "http://kiss-adapter.%s.svc.cluster.local" .Release.Namespace) .Values.kiss.adapter.baseUrl | quote }}
-  REGISTERS__0__INTERNE_TAAK_OBJECT_TYPE_URL: {{ printf "%s/api/v2/objecttypes/%s" (default (printf "http://objecttypen.%s.svc.cluster.local" .Release.Namespace) .Values.kiss.objecttypen.baseUrlIntern) .Values.kiss.objecttypen.interneTaakUUID | quote }}
-  REGISTERS__0__KLANTEN_BASE_URL: {{ printf "%s/klanten" (default (printf "http://kiss-adapter.%s.svc.cluster.local" .Release.Namespace) .Values.kiss.adapter.baseUrl) | quote }}
   KVK_BASE_URL: {{ .Values.kiss.kvk.baseUrl | quote }}
   MEDEWERKER_OBJECTEN_BASE_URL:  {{ default (printf "http://kiss-adapter.%s.svc.cluster.local" .Release.Namespace) .Values.kiss.adapter.baseUrl | quote }}
   MEDEWERKER_OBJECTTYPES_BASE_URL: {{ .Values.kiss.objecttypen.baseUrlExtern | quote }}
@@ -50,9 +46,33 @@ data:
   VAC_OBJECTEN_BASE_URL: {{ default (printf "http://objecten.%s.svc.cluster.local" .Release.Namespace) .Values.kiss.vac.objectenBaseUrl | quote }}
   VAC_OBJECT_TYPE_URL: {{ .Values.kiss.vac.objectTypeUrl | quote }}
   VAC_OBJECT_TYPE_VERSION: {{ .Values.kiss.vac.objectTypeVersion | quote }}
+  {{- if .Values.kiss.esuite.enabled  }}
+  {{- /* esuite als eerste register */}}
+  REGISTERS__0__CONTACTMOMENTEN_BASE_URL: {{ default (printf "http://kiss-adapter.%s.svc.cluster.local" .Release.Namespace) .Values.kiss.adapter.baseUrl | quote }}
+  REGISTERS__0__INTERNE_TAAK_BASE_URL: {{ default (printf "http://kiss-adapter.%s.svc.cluster.local" .Release.Namespace) .Values.kiss.adapter.baseUrl | quote }}
+  REGISTERS__0__INTERNE_TAAK_OBJECT_TYPE_URL: {{ printf "%s/api/v2/objecttypes/%s" (default (printf "http://objecttypen.%s.svc.cluster.local" .Release.Namespace) .Values.kiss.objecttypen.baseUrlIntern) .Values.kiss.objecttypen.interneTaakUUID | quote }}
+  REGISTERS__0__KLANTEN_BASE_URL: {{ printf "%s/klanten" (default (printf "http://kiss-adapter.%s.svc.cluster.local" .Release.Namespace) .Values.kiss.adapter.baseUrl) | quote }}
   REGISTERS__0__ZAAKSYSTEEM_DEEPLINK_PROPERTY: "identificatie"
   REGISTERS__0__ZAAKSYSTEEM_DEEPLINK_URL: {{ printf "%s/mp/zaak/" .Values.kiss.esuite.baseUrl | quote }}
   REGISTERS__0__ZAAKSYSTEEM_BASE_URL:  {{ default (printf "http://kiss-adapter.%s.svc.cluster.local" .Release.Namespace) .Values.kiss.adapter.baseUrl | quote }}
   REGISTERS__0__IS_DEFAULT: {{ .Values.kiss.esuite.isDefault | quote }}
   REGISTERS__0__REGISTRY_VERSION: "OpenKlant1"
+    {{- if and .Values.kiss.openklant.enabled .Values.kiss.openzaak.enabled }}
+    {{- /* openklant als tweede register NAAST de esuite */}}
+  REGISTERS__1__REGISTRY_VERSION: "OpenKlant2"
+  REGISTERS__1__IS_DEFAULT: {{ .Values.kiss.esuite.isDefault | ternary "false" "true" | quote }}
+  REGISTERS__1__KLANTINTERACTIE_BASE_URL: {{ default (printf "http://openklant.%s.svc.cluster.local/klantinteracties" .Release.Namespace) .Values.kiss.openklant.baseUrl | quote }}
+  REGISTERS__1__ZAAKSYSTEEM_BASE_URL: {{ default (printf "http://openzaak.%s.svc.cluster.local" .Release.Namespace) .Values.kiss.openzaak.baseUrl | quote }}
+  REGISTERS__1__ZAAKSYSTEEM_DEEPLINK_URL: {{ printf "%s/zaken/" .Values.kiss.zac.baseUrl  | quote }}
+  REGISTERS__1__ZAAKSYSTEEM_DEEPLINK_PROPERTY: "identificatie"
+    {{- end }}
+  {{- else if and .Values.kiss.openklant.enabled .Values.kiss.openzaak.enabled }}
+  {{- /* openklant als ENIGE register */}}
+  REGISTERS__0__REGISTRY_VERSION: "OpenKlant2"
+  REGISTERS__0__IS_DEFAULT: "true"
+  REGISTERS__0__KLANTINTERACTIE_BASE_URL: {{ default (printf "http://openklant.%s.svc.cluster.local/klantinteracties" .Release.Namespace) .Values.kiss.openklant.baseUrl | quote }}
+  REGISTERS__0__ZAAKSYSTEEM_BASE_URL: {{ default (printf "http://openzaak.%s.svc.cluster.local" .Release.Namespace) .Values.kiss.openzaak.baseUrl | quote }}
+  REGISTERS__0__ZAAKSYSTEEM_DEEPLINK_URL: {{ printf "%s/zaken/" .Values.kiss.zac.baseUrl  | quote }}
+  REGISTERS__0__ZAAKSYSTEEM_DEEPLINK_PROPERTY: "identificatie"
+  {{- end }}
 {{- end }}
