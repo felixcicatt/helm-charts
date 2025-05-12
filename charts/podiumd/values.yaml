@@ -1329,6 +1329,7 @@ kiss:
     secret: ""
     contactverzoektypen: []
     isDefault: true
+    enabled: true
 
   database:
     host: ""
@@ -1379,6 +1380,20 @@ kiss:
     medewerkerIdentificatieTruncate: null
 
   organisatieIds: ""
+
+  openzaak:
+    enabled: true
+    baseUrl: ""
+    clientId: ""
+    secret: ""
+
+  openklant:
+    enabled: true
+    baseUrl: ""
+    token: ""
+
+  zac:
+    baseUrl: ""
 
   imagePullSecrets: []
 
