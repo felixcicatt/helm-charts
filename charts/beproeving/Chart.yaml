@@ -10,3 +10,8 @@ dependencies:
     repository: "@zgw-office-addin"
     version: 0.0.31
     condition: zgw-office-addin.enabled
+  - name: pabc
+    alias: pabc
+    repository: "oci://ghcr.io/platform-autorisatie-beheer-component"
+    version: 0.0.1-rc.5
+    condition: pabc.enabled
